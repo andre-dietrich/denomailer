@@ -50,9 +50,15 @@ export class SMTPClient {
     const c = new SMTPConnection(config);
     this.#connection = c;
 
+    const self = this
     this.#ready = (async () => {
-      await c.ready;
-      await this.#prepareConnection();
+      c.ready.then(() => {
+        self.#prepareConnection().catch((err: any) => {
+          console.warn("prepare connection error:", err)
+        });
+      }).catch((err: any) => {
+        console.warn("connection ready error:", err)
+      });
     })();
   }
 
